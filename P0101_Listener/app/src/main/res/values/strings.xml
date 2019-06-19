@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">P0101_Listener</string>
+    <string name="text1">Нажата кнопка 1</string>
+    <string name="text2">Нажали на текст</string>
+</resources>
