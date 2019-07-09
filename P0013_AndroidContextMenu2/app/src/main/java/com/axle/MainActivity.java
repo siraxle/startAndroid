@@ -29,32 +29,28 @@ public class MainActivity extends AppCompatActivity {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
-        });
 
-        final MenuItem action_mail = (MenuItem) findViewById(R.id.action_mail);
-        chb2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (chb2.isChecked()){
-                    action_mail.setVisible(true);
-                }else {
-                    action_mail.setVisible(false);
-                }
-            }
         });
-
         chb1 = (CheckBox) findViewById(R.id.checkBox1);
         chb2 = (CheckBox) findViewById(R.id.checkBox2);
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    public boolean onPrepareOptionsMenu(final Menu menu) {
         menu.setGroupVisible(R.id.group1, chb1.isChecked());
+        chb2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (chb2.isChecked()){
+                    menu.setGroupVisible(R.id.group2, true);
+                }else menu.setGroupVisible(R.id.group2, false);
+            }
+        });
         return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;

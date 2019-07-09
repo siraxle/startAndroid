@@ -8,12 +8,17 @@
         android:orderInCategory="2"
         android:title="@string/action_settings"
         app:showAsAction="always" />
-    <item
-        android:icon="@android:drawable/ic_dialog_email"
-        android:id="@+id/action_mail"
-        android:orderInCategory="1"
-        android:title="@string/Mail"
-        app:showAsAction="always" />
+
+    <group
+        android:id="@+id/group2">
+        <item
+            android:icon="@android:drawable/ic_dialog_email"
+            android:id="@+id/action_mail"
+            android:orderInCategory="1"
+            android:title="@string/Mail"
+            app:showAsAction="always" />
+    </group>
+
     <group
         android:id="@+id/group1">
         <item
@@ -27,6 +32,7 @@
             android:title="@string/action_item2"
             app:showAsAction="never" />
     </group>
+
     <item
         android:id="@+id/action_item3"
         android:orderInCategory="10"
