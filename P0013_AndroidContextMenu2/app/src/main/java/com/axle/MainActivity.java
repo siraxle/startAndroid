@@ -8,9 +8,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CheckBox;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
+
+   CheckBox chb1, chb2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +30,27 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        final MenuItem action_mail = (MenuItem) findViewById(R.id.action_mail);
+        chb2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (chb2.isChecked()){
+                    action_mail.setVisible(true);
+                }else {
+                    action_mail.setVisible(false);
+                }
+            }
+        });
+
+        chb1 = (CheckBox) findViewById(R.id.checkBox1);
+        chb2 = (CheckBox) findViewById(R.id.checkBox2);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.setGroupVisible(R.id.group1, chb1.isChecked());
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
