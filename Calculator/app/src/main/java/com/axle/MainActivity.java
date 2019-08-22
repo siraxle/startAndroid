@@ -10,15 +10,27 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Stack;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     final int MENU_RESET_ID = 1;
     final int MENU_QUIT_ID = 2;
 
+    private static HashMap<String, Integer> priorities = new HashMap(){{
+        put("+", 1);
+        put("-", 1);
+        put("*", 2);
+        put("/", 2);
+        put("^", 3);
+    }};
+
     EditText etNum2;
 
     Button btn0, btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9;
-    Button btnClear, btnSin, btnPoint, btnDiv, btnRes, btnMinus, btnPlus, btnResult;
+    Button btnClear, btnSin, btnPoint, btnDiv, btnRes, btnMinus, btnPlus, btnResult, btnLeftBrackets, btnRightBrackets;
 
     TextView tvResult;
 
@@ -32,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // находим элементы
         etNum2 = (EditText) findViewById(R.id.etNum2);
+        tvResult = (TextView) findViewById(R.id.tvResult);
 
         btn0 = (Button) findViewById(R.id.btn0);
         btn1 = (Button) findViewById(R.id.btn1);
@@ -52,8 +65,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnMinus = (Button) findViewById(R.id.btnMinus);
         btnPlus = (Button) findViewById(R.id.btnPlus);
         btnResult = (Button) findViewById(R.id.btnResult);
-
-        tvResult = (TextView) findViewById(R.id.tvResult);
+        btnLeftBrackets = (Button) findViewById(R.id.btnLeftBrackets);
+        btnRightBrackets = (Button) findViewById(R.id.btnRightBrackets);
 
         // прописываем обработчик
         btn0.setOnClickListener(this);
@@ -144,42 +157,137 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btnResult:
                 tmp = "=";
+                calculate();
+                return;
+            case R.id.btnLeftBrackets:
+                tmp = " ( ";
+                break;
+            case R.id.btnRightBrackets:
+                tmp = " ) ";
                 break;
             default:
                 break;
         }
 
 //      result = "1.2 + 5.3"
-        if (tmp.equals("=")){
-            String[] subStr = result.split(" ");
-//            subStr[0] - первое число
-//            subStr[1] - знак
-//            subStr[2] - второе число
-            double a = Double.parseDouble(subStr[0]); // преобразование из строки в число
-            double b = Double.parseDouble(subStr[2]); // преобразование из строки в число
-            String sign =  subStr[1];
-            if(sign.equals("+")){
-               result = Double.toString(a + b);
-            }
-            if(sign.equals("-")){
-                result = Double.toString(a - b);
-            }
-            if(sign.equals("*")){
-                result = Double.toString(a * b);
-            }
-            if(sign.equals("/")){
-                result = Double.toString(a / b);
-            }
-            if(sign.equals("SIN")){
-                result = Double.toString(Math.sin(a));
-            }
-
-        }
+//        if (tmp.equals("=")){
+//            String[] subStr = result.split(" ");
+////            subStr[0] - первое число
+////            subStr[1] - знак
+////            subStr[2] - второе число
+//            double a = Double.parseDouble(subStr[0]); // преобразование из строки в число
+//            double b = Double.parseDouble(subStr[2]); // преобразование из строки в число
+//            String sign =  subStr[1];
+//            if(sign.equals("+")){
+//               result = Double.toString(a + b);
+//            }
+//            if(sign.equals("-")){
+//                result = Double.toString(a - b);
+//            }
+//            if(sign.equals("*")){
+//                result = Double.toString(a * b);
+//            }
+//            if(sign.equals("/")){
+//                if (b == 0){
+//                result = Double.toString(a / b);
+//                }
+//            }
+//            if(sign.equals("SIN")){
+//                result = Double.toString(Math.sin(a));
+//            }
+//
+//        }
 
         // формируем строку вывода
         result = result + tmp + "";
         etNum2.setText(result);
 
+    }
+
+    private void calculate() {
+        String expresion = etNum2.getText().toString();
+        String[] elements = expresion.split(" ");
+        Stack<Double> numbers = new Stack<>();
+        Stack<String> operations = new Stack<>();
+        int i = 0;
+        while (i < elements.length){
+            if (isNumber(elements[i])){
+                numbers.push(Double.parseDouble(elements[i]));
+                i++;
+            } else {
+
+
+                if(elements[i].equals("(")){
+                    operations.push(elements[i]);
+                    i++;
+                    continue;
+                }
+
+                if(elements[i].equals(")")){
+                    //TODO calculate
+                    continue;
+                }
+
+
+                if (operations.empty() || isMajorPriority(elements[i], operations.peek()) ){
+                    operations.push(elements[i]);
+                    i++;
+                    continue;
+                }
+
+                if (!isMajorPriority(elements[i], operations.peek()) ){
+                    Double lastNumber = numbers.pop();
+                    Double prevNumber = numbers.pop();
+                    String lastOperation = operations.pop();
+                    Double result = execOperation(prevNumber, lastOperation, lastNumber);
+                    numbers.push(result);
+                }
+            }
+
+        }
+
+        System.out.println("Size of numbers : " + numbers.size());
+        System.out.println("Size of operations : " + operations.size());
+        Double lastNumber = numbers.pop();
+        Double prevNumber = numbers.pop();
+        String lastOperation = operations.pop();
+        result = execOperation(prevNumber, lastOperation, lastNumber) + " ";
+        tvResult.setText(result + "");
+    }
+
+    private Double execOperation (Double a, String operation, Double b){
+        if (operation.equals("+")){
+            return a + b;
+        }
+        if (operation.equals("-")){
+            return a - b;
+        }
+        if (operation.equals("/")){
+            return a / b;
+        }
+        if (operation.equals("*")){
+            return a * b;
+        }
+        return null;
+    }
+
+    private boolean isMajorPriority(String currentElement, String lastElement) {
+
+        if (priorities.get(currentElement) > priorities.get(lastElement)){
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    private boolean isNumber (String n){
+        try {
+            Double.parseDouble(n);
+            return true;
+        } catch (Exception e){
+            return false;
+        }
     }
 
     // создание меню
