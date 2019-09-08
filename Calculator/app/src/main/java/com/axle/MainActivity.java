@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         put("-", 1);
         put("*", 2);
         put("/", 2);
-        put("^", 3);
     }};
 
     EditText etNum2;
@@ -65,8 +64,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnMinus = (Button) findViewById(R.id.btnMinus);
         btnPlus = (Button) findViewById(R.id.btnPlus);
         btnResult = (Button) findViewById(R.id.btnResult);
-        btnLeftBrackets = (Button) findViewById(R.id.btnLeftBrackets);
-        btnRightBrackets = (Button) findViewById(R.id.btnRightBrackets);
 
         // прописываем обработчик
         btn0.setOnClickListener(this);
@@ -88,19 +85,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnMinus.setOnClickListener(this);
         btnPlus.setOnClickListener(this);
         btnResult.setOnClickListener(this);
-
+        btnLeftBrackets.setOnClickListener(this);
+        btnRightBrackets.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
-        // TODO Auto-generated method stub
         float num1 = 0;
         float num2 = 0;
-        //float result = 0;
         String tmp = "";
 
         // определяем нажатую кнопку и выполняем соответствующую операцию
-        // в oper пишем операцию, потом будем использовать в выводе
 
         switch (v.getId()) {
             case R.id.btn0:
@@ -157,46 +152,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btnResult:
                 tmp = "=";
-                calculate();
+                String expresion = etNum2.getText().toString();
+                String[] elements = expresion.split(" ");
+                Calc mainResult = new Calc();
+                tvResult.setText(mainResult.run(elements).toString());
                 return;
-            case R.id.btnLeftBrackets:
-                tmp = " ( ";
-                break;
-            case R.id.btnRightBrackets:
-                tmp = " ) ";
-                break;
-            default:
-                break;
         }
-
-//      result = "1.2 + 5.3"
-//        if (tmp.equals("=")){
-//            String[] subStr = result.split(" ");
-////            subStr[0] - первое число
-////            subStr[1] - знак
-////            subStr[2] - второе число
-//            double a = Double.parseDouble(subStr[0]); // преобразование из строки в число
-//            double b = Double.parseDouble(subStr[2]); // преобразование из строки в число
-//            String sign =  subStr[1];
-//            if(sign.equals("+")){
-//               result = Double.toString(a + b);
-//            }
-//            if(sign.equals("-")){
-//                result = Double.toString(a - b);
-//            }
-//            if(sign.equals("*")){
-//                result = Double.toString(a * b);
-//            }
-//            if(sign.equals("/")){
-//                if (b == 0){
-//                result = Double.toString(a / b);
-//                }
-//            }
-//            if(sign.equals("SIN")){
-//                result = Double.toString(Math.sin(a));
-//            }
-//
-//        }
 
         // формируем строку вывода
         result = result + tmp + "";
@@ -204,91 +165,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    private void calculate() {
-        String expresion = etNum2.getText().toString();
-        String[] elements = expresion.split(" ");
-        Stack<Double> numbers = new Stack<>();
-        Stack<String> operations = new Stack<>();
-        int i = 0;
-        while (i < elements.length){
-            if (isNumber(elements[i])){
-                numbers.push(Double.parseDouble(elements[i]));
-                i++;
-            } else {
 
-
-                if(elements[i].equals("(")){
-                    operations.push(elements[i]);
-                    i++;
-                    continue;
-                }
-
-                if(elements[i].equals(")")){
-                    //TODO calculate
-                    continue;
-                }
-
-
-                if (operations.empty() || isMajorPriority(elements[i], operations.peek()) ){
-                    operations.push(elements[i]);
-                    i++;
-                    continue;
-                }
-
-                if (!isMajorPriority(elements[i], operations.peek()) ){
-                    Double lastNumber = numbers.pop();
-                    Double prevNumber = numbers.pop();
-                    String lastOperation = operations.pop();
-                    Double result = execOperation(prevNumber, lastOperation, lastNumber);
-                    numbers.push(result);
-                }
-            }
-
-        }
-
-        System.out.println("Size of numbers : " + numbers.size());
-        System.out.println("Size of operations : " + operations.size());
-        Double lastNumber = numbers.pop();
-        Double prevNumber = numbers.pop();
-        String lastOperation = operations.pop();
-        result = execOperation(prevNumber, lastOperation, lastNumber) + " ";
-        tvResult.setText(result + "");
-    }
-
-    private Double execOperation (Double a, String operation, Double b){
-        if (operation.equals("+")){
-            return a + b;
-        }
-        if (operation.equals("-")){
-            return a - b;
-        }
-        if (operation.equals("/")){
-            return a / b;
-        }
-        if (operation.equals("*")){
-            return a * b;
-        }
-        return null;
-    }
-
-    private boolean isMajorPriority(String currentElement, String lastElement) {
-
-        if (priorities.get(currentElement) > priorities.get(lastElement)){
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-
-    private boolean isNumber (String n){
-        try {
-            Double.parseDouble(n);
-            return true;
-        } catch (Exception e){
-            return false;
-        }
-    }
 
     // создание меню
     @Override
